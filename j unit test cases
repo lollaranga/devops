@@ -1,0 +1,48 @@
+j unit test cases: import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+public class AccountControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Test
+    public void testCreateAccount() throws Exception {
+        mockMvc.perform(post("/createAccount")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"accountNo\":\"12345\",\"accountName\":\"John Doe\",\"policyDetails\":\"Policy1\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountNo").value("12345"));
+    }
+
+    @Test
+    public void testUpdateAccount() throws Exception {
+        mockMvc.perform(put("/updateAccount/12345")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"accountName\":\"Jane Doe\",\"policyDetails\":\"Policy2\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountName").value("Jane Doe"));
+    }
+
+    @Test
+    public void testViewPolicy() throws Exception {
+        mockMvc.perform(get("/viewPolicy/12345"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accountNo").value("12345"));
+    }
+
+    @Test
+    public void testDeletePolicy() throws Exception {
+        mockMvc.perform(delete("/deletePolicy/12345"))
+                .andExpect(status().isNoContent());
+    }
+}
